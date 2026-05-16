@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from 'next/dynamic';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -12,17 +13,6 @@ import { MagneticText } from '../ui/magnetic-text';
 import LatestEventsHighlight from './LatestEventsHighlight';
 import InternshipCalendarCard from './InternshipCalendarCard';
 import CertificateCard from './CertificateCard';
-
-// ... (existing imports)
-
-// Inside Hero component return:
-{/* Featured Content Grid */ }
-<div className="w-full px-2 mt-12 grid grid-cols-1 lg:grid-cols-2 gap-4 relative z-10">
-    <LatestEventsHighlight className="w-full mt-0 mb-0" />
-    <InternshipCalendarCard />
-    <CertificateCard />
-</div>
-import dynamic from 'next/dynamic';
 
 const HeaderScene = dynamic(() => import('@/components/3d/HeaderScene'), { ssr: false });
 
