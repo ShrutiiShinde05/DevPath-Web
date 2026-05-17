@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -258,14 +258,16 @@ export default function UserProfile() {
                     {/* Profile Card */}
                     <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
                         <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-full lg:h-auto lg:aspect-square mb-4 group">
-                            <img
-                                src={user.photoURL || `https://ui-avatars.com/api/?name=${user.name}&background=random`}
-                                alt={user.name || 'User'}
-                                className="w-full h-full object-cover rounded-full border-4 border-card shadow-xl"
-                            />
+                            <div className="w-full h-full rounded-full overflow-hidden border-4 border-card shadow-xl">
+                                <img
+                                    src={user.photoURL || `https://ui-avatars.com/api/?name=${user.name}&background=random`}
+                                    alt={user.name || 'User'}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
                             <button
                                 onClick={() => setIsEditingPhoto(!isEditingPhoto)}
-                                className="absolute bottom-4 right-4 p-2 bg-card text-foreground rounded-full border border-border shadow-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100"
+                                className="absolute bottom-2 right-2 md:bottom-4 md:right-4 p-2 bg-card text-foreground rounded-full border border-border shadow-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100 z-10"
                                 title="Change Avatar"
                             >
                                 <Camera size={18} />
