@@ -257,7 +257,7 @@ export default function UserProfile() {
                 <aside className="lg:col-span-1 space-y-6">
                     {/* Profile Card */}
                     <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
-                        <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-full lg:aspect-square mb-4 group">
+                        <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-full lg:h-auto lg:aspect-square mb-4 group">
                             <div className="w-full h-full rounded-full overflow-hidden border-4 border-card shadow-xl">
                                 <img
                                     src={user.photoURL || `https://ui-avatars.com/api/?name=${user.name}&background=random`}
