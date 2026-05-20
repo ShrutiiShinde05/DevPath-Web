@@ -49,7 +49,7 @@ jobs:
           done
 
       - name: Run Nuclei Scan
-        uses: projectdiscovery/nuclei-action@v2
+        uses: projectdiscovery/nuclei-action@v3
         with:
           target: http://localhost:3000
           flags: "-tags exposure,misconfig,headers,tech -severity low,medium,high,critical"
