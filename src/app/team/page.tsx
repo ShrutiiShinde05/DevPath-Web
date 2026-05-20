@@ -76,15 +76,37 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
         return degrees;
     }, [getCenterOfElement]);
 
+    const pointerMoveRafRef = useRef<number | null>(null);
+    const pointerPositionRef = useRef<{ x: number; y: number } | null>(null);
+
     const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
         const card = cardRef.current;
         if (!card) return;
         const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        setEdgeProximity(getEdgeProximity(card, x, y));
-        setCursorAngle(getCursorAngle(card, x, y));
+        pointerPositionRef.current = {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+        };
+
+        if (pointerMoveRafRef.current !== null) return;
+
+        pointerMoveRafRef.current = requestAnimationFrame(() => {
+            pointerMoveRafRef.current = null;
+            const nextCard = cardRef.current;
+            const position = pointerPositionRef.current;
+            if (!nextCard || !position) return;
+            setEdgeProximity(getEdgeProximity(nextCard, position.x, position.y));
+            setCursorAngle(getCursorAngle(nextCard, position.x, position.y));
+        });
     }, [getEdgeProximity, getCursorAngle]);
+
+    useEffect(() => {
+        return () => {
+            if (pointerMoveRafRef.current !== null) {
+                cancelAnimationFrame(pointerMoveRafRef.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         if (!animated) return;
