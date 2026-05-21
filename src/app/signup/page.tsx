@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { User, Mail, Lock, Phone, Github, Linkedin, Instagram, ArrowRight, MapPin, Key } from 'lucide-react';
 import Link from 'next/link';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
 // const ADMIN_KEY = "DEVPATH_CORE_2025"; // Removed in favor of dynamic key
@@ -124,7 +124,7 @@ export default function SignupPage() {
                     github,
                     instagram,
                     role: 'member',
-                    createdAt: new Date().toISOString(),
+                    createdAt: serverTimestamp(),
                     xp: 0,
                     rank: 0,
                     streak: 0,
