@@ -56,11 +56,10 @@ export default function LoginPage() {
             await login(email, password);
             // Login successful. Now check if admin.
 
-            const { doc, getDoc, getFirestore } = await import('firebase/firestore');
-            const { app } = await import('@/lib/firebase');
-            const db = getFirestore(app);
+const { doc, getDoc } = await import('firebase/firestore');
+const { db } = await import('@/lib/firebase'); // 'app' ki zaroorat nahi, 'db' seedha import karo
 
-            const adminDoc = await getDoc(doc(db, 'admins', email));
+const adminDoc = await getDoc(doc(db, 'admins', email));
             if (adminDoc.exists()) {
                 setShowAdminKeyModal(true);
             } else {

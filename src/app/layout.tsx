@@ -1,3 +1,4 @@
+import MaintenanceBlocker from '@/components/layout/MaintenanceBlocker';
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, Barlow_Condensed } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
@@ -108,8 +109,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+             type="application/ld+json"
+             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
           <AuthProvider>
             <GamificationProvider>
@@ -118,9 +119,14 @@ export default function RootLayout({
                 {/* <BackgroundMesh /> */}
                 <MaintenanceBanner />
                 <Navbar />
-                <PageWrapper>
-                  {children}
-                </PageWrapper>
+                
+                {/* YAHAN HUMNE BLOCKER ADD KIYA HAI */}
+                <MaintenanceBlocker>
+                  <PageWrapper>
+                    {children}
+                  </PageWrapper>
+                </MaintenanceBlocker>
+                
                 <FooterWrapper />
               </RealTimeProvider>
             </GamificationProvider>

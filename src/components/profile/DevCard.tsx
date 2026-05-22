@@ -1,17 +1,5 @@
 "use client";
 
-/**
- * DevCard — Shareable Developer Profile Card
- *
- * Renders a full-width card showing a user's XP, global rank, streak,
- * badges, and GitHub language stats. Features:
- *   - Download as PNG  (html2canvas, lazy-loaded client-side only)
- *   - Copy profile link to clipboard
- *   - Animated XP / streak counters on mount
- *   - Staggered entrance via framer-motion
- *   - Fully icon-based (no emoji)
- */
-
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -46,7 +34,6 @@ const BADGE_REGISTRY: Record<string, { name: string; Icon: React.ElementType; co
   'top-collaborator':  { name: 'Top Collaborator',   Icon: Users,       color: '#2dd4bf' },
 };
 
-// Language color map
 const LANG_COLORS: Record<string, string> = {
   TypeScript: '#3178c6', JavaScript: '#f7df1e', Python: '#3572A5',
   Java: '#b07219', Go: '#00ADD8', Rust: '#dea584', 'C++': '#f34b7d',
@@ -56,7 +43,6 @@ const LANG_COLORS: Record<string, string> = {
 };
 const getLangColor = (lang: string) => LANG_COLORS[lang] ?? '#94a3b8';
 
-// ── Level color resolver (converts Tailwind class names to hex) ───────────────
 function resolveLevelColor(colorClass: string): string {
   const map: Record<string, string> = {
     'text-gray-500': '#6b7280',   'text-slate-500': '#64748b',
@@ -80,7 +66,6 @@ function resolveLevelBg(bgClass: string): string {
   return map[bgClass] ?? 'rgba(148,163,184,0.12)';
 }
 
-// ── Animated counter ─────────────────────────────────────────────────────────
 function useAnimatedCount(target: number, duration = 1400) {
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -97,7 +82,6 @@ function useAnimatedCount(target: number, duration = 1400) {
   return count;
 }
 
-// ── Format helpers ────────────────────────────────────────────────────────────
 function fmtPoints(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}K`;
@@ -111,7 +95,6 @@ function fmtDate(raw: any): string {
   } catch { return 'Member'; }
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
 export default function DevCard({ user }: { user: any }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [rank, setRank]             = useState<number | null>(null);
@@ -149,7 +132,6 @@ export default function DevCard({ user }: { user: any }) {
 
   const topBadges  = earnedBadges.slice(0, 4);
   const extraCount = Math.max(0, earnedBadges.length - 4);
-
   const topLangs = ((user?.githubStats?.topLanguages ?? []) as { language: string; count: number }[]).slice(0, 4);
   const totalLang = topLangs.reduce((s, l) => s + l.count, 0);
 
@@ -160,7 +142,6 @@ export default function DevCard({ user }: { user: any }) {
     ? `${window.location.origin}/u?uid=${user?.uid}`
     : `devpath.in/u?uid=${user?.uid}`;
 
-  // ── Download PNG ──────────────────────────────────────────────────────────
   const handleDownload = async () => {
     if (!cardRef.current || downloading) return;
     setDownloading(true);
@@ -180,7 +161,6 @@ export default function DevCard({ user }: { user: any }) {
     }
   };
 
-  // ── Copy link ─────────────────────────────────────────────────────────────
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(profileUrl);
@@ -189,270 +169,86 @@ export default function DevCard({ user }: { user: any }) {
     } catch { /* silent */ }
   };
 
-  // ── Motion variants ───────────────────────────────────────────────────────
   const container = { hidden: {}, show: { transition: { staggerChildren: 0.07 } } };
   const item = {
     hidden: { opacity: 0, y: 14 },
-    show:   { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.19, 1, 0.22, 1] } },
+    show:   { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.19, 1, 0.22, 1] as any } },
   };
 
   return (
     <div className={styles.wrapper}>
-
-      {/* ── Card shell ── */}
       <motion.div
         ref={cardRef}
         className={styles.card}
         initial={{ opacity: 0, y: 28, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.65, ease: [0.19, 1, 0.22, 1] }}
+        transition={{ duration: 0.65, ease: [0.19, 1, 0.22, 1] as any }}
         id="devcard-render"
       >
         <div className={styles.cardInner}>
-
-          {/* ── Left panel ── */}
-          <motion.div
-            className={styles.leftPanel}
-            variants={container} initial="hidden" animate="show"
-          >
-            {/* Avatar */}
+          <motion.div className={styles.leftPanel} variants={container} initial="hidden" animate="show">
             <motion.div className={styles.avatarRing} variants={item}>
               <div className={styles.avatarRingInner} />
               {user?.photoURL ? (
-                <Image
-                  src={user.photoURL} alt={user?.name ?? 'Developer'}
-                  fill className={styles.avatar} unoptimized
-                />
+                <Image src={user.photoURL} alt={user?.name ?? 'Developer'} fill className={styles.avatar} unoptimized />
               ) : (
-                <div className={styles.avatarFallback}>
-                  {user?.name?.charAt(0)?.toUpperCase() ?? '?'}
-                </div>
+                <div className={styles.avatarFallback}>{user?.name?.charAt(0)?.toUpperCase() ?? '?'}</div>
               )}
             </motion.div>
-
-            {/* Name */}
-            <motion.h2 className={styles.name} variants={item}>
-              {user?.name ?? 'Developer'}
-            </motion.h2>
-
-            {/* Level badge */}
-            <motion.div
-              className={styles.levelBadge}
-              variants={item}
-              style={{ background: levelBg, color: levelColor, borderColor: `${levelColor}44` }}
-            >
+            <motion.h2 className={styles.name} variants={item}>{user?.name ?? 'Developer'}</motion.h2>
+            <motion.div className={styles.levelBadge} variants={item} style={{ background: levelBg, color: levelColor, borderColor: `${levelColor}44` }}>
               <Medal size={11} />
               <span>{level.name}</span>
             </motion.div>
-
-            {/* Meta rows */}
             <motion.div className={styles.meta} variants={item}>
               {(user?.city || user?.state) && (
-                <span className={styles.metaRow}>
-                  <MapPin size={10} />
-                  {[user.city, user.state].filter(Boolean).join(', ')}
-                </span>
+                <span className={styles.metaRow}><MapPin size={10} />{[user.city, user.state].filter(Boolean).join(', ')}</span>
               )}
-              <span className={styles.metaRow}>
-                <Calendar size={10} />
-                Joined {fmtDate(user?.createdAt)}
-              </span>
-              {user?.githubStats?.username && (
-                <span className={styles.metaRow}>
-                  <Github size={10} />
-                  {user.githubStats.username}
-                </span>
-              )}
+              <span className={styles.metaRow}><Calendar size={10} />Joined {fmtDate(user?.createdAt)}</span>
+              {user?.githubStats?.username && <span className={styles.metaRow}><Github size={10} />{user.githubStats.username}</span>}
             </motion.div>
-
-            {/* Level progress bar */}
             <motion.div className={styles.progressSection} variants={item}>
-              <div className={styles.progressMeta}>
-                <span className={styles.progressLabel}>Level Progress</span>
-                <span className={styles.progressPct}>{Math.round(levelInfo.progress)}%</span>
-              </div>
+              <div className={styles.progressMeta}><span className={styles.progressLabel}>Level Progress</span><span className={styles.progressPct}>{Math.round(levelInfo.progress)}%</span></div>
               <div className={styles.progressTrack}>
-                <motion.div
-                  className={styles.progressFill}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${levelInfo.progress}%` }}
-                  transition={{ delay: 0.6, duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ background: `linear-gradient(90deg, ${levelColor}, ${levelColor}99)` }}
-                />
+                <motion.div className={styles.progressFill} initial={{ width: 0 }} animate={{ width: `${levelInfo.progress}%` }} transition={{ delay: 0.6, duration: 1.2, ease: [0.19, 1, 0.22, 1] as any }} style={{ background: `linear-gradient(90deg, ${levelColor}, ${levelColor}99)` }} />
               </div>
             </motion.div>
           </motion.div>
 
-          {/* ── Right panel ── */}
-          <motion.div
-            className={styles.rightPanel}
-            variants={container} initial="hidden" animate="show"
-          >
-            {/* Stats grid */}
+          <motion.div className={styles.rightPanel} variants={container} initial="hidden" animate="show">
             <motion.div className={styles.statsGrid} variants={item}>
-
-              <div className={styles.statCard}>
-                <div className={styles.statIconWrap} style={{ background: 'rgba(0,212,255,0.1)', color: '#00d4ff' }}>
-                  <Zap size={14} strokeWidth={2.5} />
-                </div>
-                <span className={`${styles.statValue} ${styles.cyan}`}>{fmtPoints(animXP)}</span>
-                <span className={styles.statLabel}>Dev XP</span>
-              </div>
-
-              <div className={styles.statCard}>
-                <div className={styles.statIconWrap} style={{ background: 'rgba(168,85,247,0.1)', color: '#c084fc' }}>
-                  <Trophy size={14} strokeWidth={2.5} />
-                </div>
-                <span className={`${styles.statValue} ${styles.purple}`}>
-                  {rankLoading ? '—' : rank ? `#${rank}` : '—'}
-                </span>
-                <span className={styles.statLabel}>Global Rank</span>
-              </div>
-
-              <div className={styles.statCard}>
-                <div className={styles.statIconWrap} style={{ background: 'rgba(249,115,22,0.1)', color: '#fb923c' }}>
-                  <Flame size={14} strokeWidth={2.5} />
-                </div>
-                <span className={`${styles.statValue} ${styles.flame}`}>{animStreak}d</span>
-                <span className={styles.statLabel}>Streak</span>
-              </div>
-
-              <div className={styles.statCard}>
-                <div className={styles.statIconWrap} style={{ background: 'rgba(251,191,36,0.1)', color: '#fbbf24' }}>
-                  <Award size={14} strokeWidth={2.5} />
-                </div>
-                <span className={styles.statValue}>{earnedBadges.length}</span>
-                <span className={styles.statLabel}>Badges</span>
-              </div>
-
-              <div className={styles.statCard}>
-                <div className={styles.statIconWrap} style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399' }}>
-                  <Brain size={14} strokeWidth={2.5} />
-                </div>
-                <span className={styles.statValue}>{user?.completedQuizzes?.length ?? 0}</span>
-                <span className={styles.statLabel}>Quizzes</span>
-              </div>
-
-              <div className={styles.statCard}>
-                <div className={styles.statIconWrap} style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8' }}>
-                  {user?.githubStats?.connected
-                    ? <Github size={14} strokeWidth={2.5} />
-                    : <Users size={14} strokeWidth={2.5} />}
-                </div>
-                <span className={styles.statValue}>
-                  {user?.githubStats?.connected
-                    ? fmtPoints(user.githubStats.totalStars ?? user.githubStats.stars ?? 0)
-                    : (user?.followers?.length ?? 0)}
-                </span>
-                <span className={styles.statLabel}>
-                  {user?.githubStats?.connected ? 'GH Stars' : 'Followers'}
-                </span>
-              </div>
-
+              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(0,212,255,0.1)', color: '#00d4ff' }}><Zap size={14} strokeWidth={2.5} /></div><span className={`${styles.statValue} ${styles.cyan}`}>{fmtPoints(animXP)}</span><span className={styles.statLabel}>Dev XP</span></div>
+              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(168,85,247,0.1)', color: '#c084fc' }}><Trophy size={14} strokeWidth={2.5} /></div><span className={`${styles.statValue} ${styles.purple}`}>{rankLoading ? '—' : rank ? `#${rank}` : '—'}</span><span className={styles.statLabel}>Global Rank</span></div>
+              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(249,115,22,0.1)', color: '#fb923c' }}><Flame size={14} strokeWidth={2.5} /></div><span className={`${styles.statValue} ${styles.flame}`}>{animStreak}d</span><span className={styles.statLabel}>Streak</span></div>
+              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(251,191,36,0.1)', color: '#fbbf24' }}><Award size={14} strokeWidth={2.5} /></div><span className={styles.statValue}>{earnedBadges.length}</span><span className={styles.statLabel}>Badges</span></div>
+              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399' }}><Brain size={14} strokeWidth={2.5} /></div><span className={styles.statValue}>{user?.completedQuizzes?.length ?? 0}</span><span className={styles.statLabel}>Quizzes</span></div>
+              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8' }}>{user?.githubStats?.connected ? <Github size={14} strokeWidth={2.5} /> : <Users size={14} strokeWidth={2.5} />}</div><span className={styles.statValue}>{user?.githubStats?.connected ? fmtPoints(user.githubStats.totalStars ?? user.githubStats.stars ?? 0) : (user?.followers?.length ?? 0)}</span><span className={styles.statLabel}>{user?.githubStats?.connected ? 'GH Stars' : 'Followers'}</span></div>
             </motion.div>
-
-            {/* Earned badges */}
             {topBadges.length > 0 && (
               <motion.div variants={item} className={styles.badgesSection}>
-                <span className={styles.sectionLabel}>
-                  <Award size={11} /> Top Achievements
-                </span>
-                <div className={styles.badgesRow}>
-                  {topBadges.map(b => {
-                    const BadgeIcon = b.Icon;
-                    return (
-                      <span key={b.id} className={styles.badge} style={{ borderColor: `${b.color}33` }}>
-                        <BadgeIcon size={12} color={b.color} strokeWidth={2.5} />
-                        <span>{b.name}</span>
-                      </span>
-                    );
-                  })}
-                  {extraCount > 0 && (
-                    <span className={styles.badgeMore}>
-                      +{extraCount} more
-                    </span>
-                  )}
-                </div>
+                <span className={styles.sectionLabel}><Award size={11} /> Top Achievements</span>
+                <div className={styles.badgesRow}>{topBadges.map((b: any) => { const BadgeIcon = b.Icon; return (<span key={b.id} className={styles.badge} style={{ borderColor: `${b.color}33` }}><BadgeIcon size={12} color={b.color} strokeWidth={2.5} /><span>{b.name}</span></span>); })} {extraCount > 0 && <span className={styles.badgeMore}>+{extraCount} more</span>}</div>
               </motion.div>
             )}
-
-            {/* GitHub language bars */}
             {topLangs.length > 0 && (
               <motion.div variants={item} className={styles.languagesSection}>
-                <span className={styles.sectionLabel}>
-                  <Code2 size={11} /> Top Languages
-                </span>
-                {topLangs.map(({ language, count }) => {
-                  const pct = totalLang > 0 ? Math.round((count / totalLang) * 100) : 0;
-                  return (
-                    <div key={language} className={styles.langRow}>
-                      <span className={styles.langDot} style={{ background: getLangColor(language) }} />
-                      <span className={styles.langName}>{language}</span>
-                      <div className={styles.langBar}>
-                        <div
-                          className={styles.langBarFill}
-                          style={{
-                            width: langMounted ? `${pct}%` : '0%',
-                            background: getLangColor(language),
-                          }}
-                        />
-                      </div>
-                      <span className={styles.langPct}>{pct}%</span>
-                    </div>
-                  );
-                })}
-              </motion.div>
-            )}
-
-            {/* Empty state if no badges and no langs */}
-            {topBadges.length === 0 && topLangs.length === 0 && (
-              <motion.div variants={item} className={styles.emptyHint}>
-                <Sparkles size={18} style={{ opacity: 0.4 }} />
-                <span>Complete your profile to fill this card</span>
+                <span className={styles.sectionLabel}><Code2 size={11} /> Top Languages</span>
+                {topLangs.map(({ language, count }) => { const pct = totalLang > 0 ? Math.round((count / totalLang) * 100) : 0; return (<div key={language} className={styles.langRow}><span className={styles.langDot} style={{ background: getLangColor(language) }} /><span className={styles.langName}>{language}</span><div className={styles.langBar}><div className={styles.langBarFill} style={{ width: langMounted ? `${pct}%` : '0%', background: getLangColor(language) }} /></div><span className={styles.langPct}>{pct}%</span></div>); })}
               </motion.div>
             )}
           </motion.div>
 
-          {/* ── Footer ── */}
           <div className={styles.footer}>
             <span className={styles.footerBrand}>DevPath · Developer Network</span>
-            <span className={styles.footerUrl}>
-              <ChevronRight size={11} style={{ opacity: 0.5 }} />
-              devpath.in
-            </span>
+            <span className={styles.footerUrl}><ChevronRight size={11} style={{ opacity: 0.5 }} />devpath.in</span>
           </div>
         </div>
       </motion.div>
 
-      {/* ── Actions ── */}
-      <motion.div
-        className={styles.actions}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.45, duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-      >
-        <button
-          id="devcard-download-btn"
-          className={`${styles.btn} ${styles.btnPrimary}`}
-          onClick={handleDownload}
-          disabled={downloading}
-          aria-label="Download Dev Card as PNG"
-        >
-          <Download size={15} />
-          {downloading ? 'Generating...' : 'Download Card'}
-        </button>
-
-        <button
-          id="devcard-copy-btn"
-          className={`${styles.btn} ${copied ? styles.btnSuccess : styles.btnSecondary}`}
-          onClick={handleCopy}
-          aria-label="Copy profile link"
-        >
-          {copied ? <Check size={15} /> : <Link2 size={15} />}
-          {copied ? 'Copied!' : 'Copy Profile Link'}
-        </button>
+      <motion.div className={styles.actions} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5, ease: [0.19, 1, 0.22, 1] as any }}>
+        <button id="devcard-download-btn" className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleDownload} disabled={downloading} aria-label="Download Dev Card as PNG"><Download size={15} />{downloading ? 'Generating...' : 'Download Card'}</button>
+        <button id="devcard-copy-btn" className={`${styles.btn} ${copied ? styles.btnSuccess : styles.btnSecondary}`} onClick={handleCopy} aria-label="Copy profile link">{copied ? <Check size={15} /> : <Link2 size={15} />}{copied ? 'Copied!' : 'Copy Profile Link'}</button>
       </motion.div>
-
     </div>
   );
 }
