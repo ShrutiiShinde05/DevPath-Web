@@ -3,12 +3,19 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Shield, Database, X } from 'lucide-react';
-import { doc, updateDoc, onSnapshot, collection, getDocs, query, orderBy, addDoc, serverTimestamp, deleteDoc, where, setDoc, arrayRemove, increment, arrayUnion, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, onSnapshot, collection, getDocs, query, orderBy, addDoc, serverTimestamp, deleteDoc, where, setDoc, arrayRemove, increment, arrayUnion, getDoc, limit, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Image from 'next/image';
 import { determineBadges, getBadgeXp } from '@/lib/point-calculation';
 
+const PAGE_SIZE = 50;
+
 export default function AdminDashboard({ initialAuth = false }: { initialAuth?: boolean }) {
+    // === Pagination States ===
+    const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+
     // === Maintenance States ===
     const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [maintenanceMsg, setMaintenanceMsg] = useState('');
@@ -65,8 +72,13 @@ export default function AdminDashboard({ initialAuth = false }: { initialAuth?: 
         setSearching(true);
         try {
             const membersRef = collection(db, 'members');
-            const membersSnap = await getDocs(membersRef);
-            const membersList = membersSnap.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+            const membersQuery = query(
+                membersRef,
+                orderBy('createdAt', 'desc'),
+                limit(PAGE_SIZE)
+            );
+            const membersSnap = await getDocs(membersQuery);
+            const membersList = membersSnap.docs.map(doc => ({ uid: doc.id, ...doc.data() } as any));
 
             const adminsRef = collection(db, 'admins');
             const adminsSnap = await getDocs(adminsRef);
@@ -109,10 +121,86 @@ export default function AdminDashboard({ initialAuth = false }: { initialAuth?: 
             const allUsers = Array.from(userMap.values());
             console.log(`Found ${allUsers.length} total users.`);
             setUsers(allUsers);
+
+            const lastVisibleDoc = membersSnap.docs[membersSnap.docs.length - 1] || null;
+            setLastVisible(lastVisibleDoc);
+            setHasMore(membersSnap.docs.length === PAGE_SIZE);
         } catch (error) {
             console.error("Error fetching users:", error);
         } finally {
             setSearching(false);
+        }
+    };
+
+    const loadMoreMembers = async () => {
+        if (loadingMore || !hasMore || !lastVisible) return;
+        setLoadingMore(true);
+        try {
+            const membersRef = collection(db, 'members');
+            const membersQuery = query(
+                membersRef,
+                orderBy('createdAt', 'desc'),
+                startAfter(lastVisible),
+                limit(PAGE_SIZE)
+            );
+            const membersSnap = await getDocs(membersQuery);
+            const membersList = membersSnap.docs.map(doc => ({ uid: doc.id, ...doc.data() } as any));
+
+            if (membersList.length > 0) {
+                const adminsRef = collection(db, 'admins');
+                const adminsSnap = await getDocs(adminsRef);
+                const adminsList = adminsSnap.docs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        uid: doc.id,
+                        ...data,
+                        email: data.email || (doc.id.includes('@') ? doc.id : undefined),
+                        role: 'admin' 
+                    };
+                });
+
+                const userMap = new Map();
+                users.forEach(user => {
+                    if (user.uid) userMap.set(user.uid, user);
+                });
+                membersList.forEach(member => {
+                    if (member.uid) userMap.set(member.uid, member);
+                });
+
+                adminsList.forEach(admin => {
+                    let targetUid = admin.uid;
+                    if (!targetUid || targetUid.includes('@')) {
+                        const matchingMember = membersList.find(m => m.email === admin.email);
+                        if (matchingMember) {
+                            targetUid = matchingMember.uid;
+                        } else {
+                            targetUid = admin.uid || admin.email;
+                        }
+                    }
+
+                    if (targetUid) {
+                        const existing = userMap.get(targetUid);
+                        if (existing) {
+                            userMap.set(targetUid, { ...existing, ...admin, uid: targetUid, role: 'admin' });
+                        } else {
+                            userMap.set(targetUid, { ...admin, uid: targetUid, role: 'admin' });
+                        }
+                    }
+                });
+
+                const allUsers = Array.from(userMap.values());
+                setUsers(allUsers);
+            }
+
+            const lastVisibleDoc = membersSnap.docs[membersSnap.docs.length - 1] || null;
+            if (lastVisibleDoc) {
+                setLastVisible(lastVisibleDoc);
+            }
+            setHasMore(membersSnap.docs.length === PAGE_SIZE);
+        } catch (error) {
+            console.error("Error loading more members:", error);
+        } finally {
+            setLoadingMore(false);
         }
     };
 
@@ -591,6 +679,17 @@ export default function AdminDashboard({ initialAuth = false }: { initialAuth?: 
                 </div>
                 
                 {/* DO NOT DELETE THE REST OF THE UI BELOW THIS IN YOUR FILE */}
+                {hasMore && (
+                    <div className="flex justify-center mt-6">
+                        <button
+                            onClick={loadMoreMembers}
+                            disabled={loadingMore}
+                            className="px-6 py-2 bg-primary text-white rounded-md font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {loadingMore ? 'Loading...' : 'Load More'}
+                        </button>
+                    </div>
+                )}
 
             </div>
         </div>
