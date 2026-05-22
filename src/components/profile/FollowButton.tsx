@@ -48,7 +48,7 @@ export default function FollowButton({ targetUserId, targetRole = 'member', targ
         }
     };
 
-    if (!user || user.uid === targetUserId) return null;
+    if (user && user.uid === targetUserId) return null;
 
     return (
         <button
