@@ -1,7 +1,7 @@
 # DevPath India Community Website
 
 <p align="center">
-  <img src="public/logo.png" alt="DevPath Logo" width="250"/>
+  <img src="public/logo.webp" alt="DevPath Logo" width="250"/>
 </p>
 
 <p align="center">
