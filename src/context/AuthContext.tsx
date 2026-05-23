@@ -96,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribeSnapshot = useRef<(() => void) | null>(null);
 
 
-    const SUPER_ADMIN_EMAIL = 'devpathind.community@gmail.com';
+    const SUPER_ADMIN_EMAIL = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || 'devpathind.community@gmail.com';
 
     useEffect(() => {
         // Ensure persistence is set to local
@@ -377,7 +377,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const updateUserProfile = async (data: Partial<User>) => {
         if (!user || !auth.currentUser) return;
-        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
+        if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
 
         try {
             // 1. Update Firestore
@@ -486,7 +486,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const unfollowUser = async (targetUserId: string, targetRole: string = 'member', targetEmail?: string) => {
         if (!user) return;
-        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
+        if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
         try {
             const batch = (await import('firebase/firestore')).writeBatch(db);
             const arrayRemove = (await import('firebase/firestore')).arrayRemove;
@@ -542,7 +542,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const followCommunity = async () => {
         if (!user) return;
-        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
+        if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
         // Check if already followed (using a flag or badge)
         if (user.achievements?.includes('community_follower')) return;
 
