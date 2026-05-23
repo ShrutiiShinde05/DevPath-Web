@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     siteName: "DevPath Community",
     images: [
       {
-        url: "/DevPath-logo.png",
+        url: "/DevPath-logo.webp",
         width: 800,
         height: 600,
         alt: "DevPath Community Logo",
@@ -65,12 +65,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "DevPath Community",
     description: "Join 50,000+ developers accelerating their coding skills through structured paths, real projects, and an active community.",
-    images: ["/DevPath-logo.png"],
+    images: ["/DevPath-logo.webp"],
     creator: "@DevPath_Community", // Assuming handle
   },
   icons: {
-    icon: '/DevPath-logo.png',
-    apple: '/DevPath-logo.png',
+    icon: '/DevPath-logo.webp',
+    apple: '/DevPath-logo.webp',
   },
 };
 
@@ -79,7 +79,7 @@ const jsonLd = {
   "@type": "Organization",
   "name": "DevPath Community",
   "url": "https://devpath-website.web.app",
-  "logo": "https://devpath-website.web.app/DevPath-logo.png",
+  "logo": "https://devpath-website.web.app/DevPath-logo.webp",
   "sameAs": [
     "https://twitter.com/DevPath_Community",
     "https://www.linkedin.com/company/devpath-community",

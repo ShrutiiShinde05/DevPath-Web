@@ -30,7 +30,7 @@ export default function Sponsors() {
     const eventSponsors = [
         {
             name: "Devfolio",
-            logo: "https://github.com/devfolioco/brand-assets/blob/main/Logo/Logo.png?raw=true",
+            logo: "https://github.com/devfolioco/brand-assets/blob/main/Logo/logo.webp?raw=true",
             url: "https://devfolio.co/"
         },
         {
