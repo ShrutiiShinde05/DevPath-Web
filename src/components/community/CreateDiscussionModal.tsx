@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import {writeBatch, doc, collection, serverTimestamp, increment } from 'firebase/firestore';
 
 interface CreateDiscussionModalProps {
     isOpen: boolean;
@@ -12,6 +12,10 @@ interface CreateDiscussionModalProps {
     userName: string;
     onSuccess: () => void;
 }
+
+    const POINTS = {
+        CREATE_DISCUSSION: 10,
+    };
 
 export default function CreateDiscussionModal({ isOpen, onClose, userId, userName, onSuccess }: CreateDiscussionModalProps) {
     const [title, setTitle] = useState('');
@@ -27,8 +31,11 @@ export default function CreateDiscussionModal({ isOpen, onClose, userId, userNam
 
         try {
             const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
-
-            await addDoc(collection(db, 'discussions'), {
+            const batch = writeBatch(db);
+            
+            const discussionRef = doc(collection(db, 'discussions'));
+            const memberRef = doc(db, 'members', userId);
+            batch.set(discussionRef,{
                 authorId: userId,
                 authorName: userName,
                 title,
@@ -37,13 +44,16 @@ export default function CreateDiscussionModal({ isOpen, onClose, userId, userNam
                 likes: [],
                 replyCount: 0,
                 createdAt: serverTimestamp()
-            });
-
-            onSuccess();
-            onClose();
+                });
+                batch.update(memberRef, {
+                    points: increment(POINTS.CREATE_DISCUSSION)
+                });
+            await batch.commit();
             setTitle('');
             setContent('');
             setTags('');
+            onSuccess();
+            onClose();
         } catch (error) {
             console.error("Error creating discussion:", error);
             alert("Failed to create discussion. Please try again.");
