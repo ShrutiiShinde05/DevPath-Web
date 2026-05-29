@@ -66,7 +66,7 @@ export default function LearningPaths() {
     const [email, setEmail] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
     
-    // Infinite Scroll State Configuration Layer
+    // Horizontal Infinite Scroll State Configuration
     const [visibleCount, setVisibleCount] = useState(2); 
     const observerAnchorRef = useRef<HTMLDivElement | null>(null);
 
@@ -76,10 +76,13 @@ export default function LearningPaths() {
 
         const scrollObserver = new IntersectionObserver((intersectEntries) => {
             if (intersectEntries[0].isIntersecting && visibleCount < paths.length) {
-                // Smoothly increment visible cards batching list
-                setVisibleCount((prevValue) => Math.min(prevValue + 2, paths.length));
+                // Smoothly load next horizontal elements block
+                setVisibleCount((prevValue) => Math.min(prevValue + 1, paths.length));
             }
-        }, { threshold: 0.1 });
+        }, { 
+            root: targetAnchor.parentElement, // Tracks scrolling within the carousel container box
+            threshold: 0.1 
+        });
 
         scrollObserver.observe(targetAnchor);
         return () => {
@@ -112,12 +115,12 @@ export default function LearningPaths() {
                 </p>
             </div>
 
-            <div className={styles.carousel}>
+            <div className={styles.carousel} style={{ display: 'flex', overflowX: 'auto', gap: '16px', alignItems: 'center' }}>
                 {paths.slice(0, visibleCount).map((path, index) => (
                     <div
                         key={index}
                         className={`${styles.pathCard} ${path.status === 'coming-soon' ? styles.comingSoon : ''}`}
-                        style={{ background: path.color }}
+                        style={{ background: path.color, flexShrink: 0 }}
                         onClick={() => handlePathClick(path)}
                     >
                         {path.status === 'coming-soon' && <ComingSoonBadge />}
@@ -165,15 +168,15 @@ export default function LearningPaths() {
                         </div>
                     </div>
                 ))}
-            </div>
 
-            {/* Core Infinite Scroll Interceptor Trigger Target Element */}
-            <div ref={observerAnchorRef} style={{ width: '100%', height: '20px', margin: '15px 0', textAlign: 'center' }}>
-                {visibleCount < paths.length ? (
-                    <span style={{ fontSize: '14px', color: '#6B7280', animation: 'pulse 2s infinite' }}>🔄 Loading more tracks...</span>
-                ) : (
-                    <span style={{ fontSize: '14px', color: '#10B981', fontWeight: 'bold' }}>🎉 You have reached the end of the roadmaps!</span>
-                )}
+                {/* Horizontal Interceptor Trigger Target Element (placed at the right end inside the slider container) */}
+                <div ref={observerAnchorRef} style={{ width: '40px', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {visibleCount < paths.length ? (
+                        <span style={{ fontSize: '20px', color: '#6B7280' }}>🔄</span>
+                    ) : (
+                        <span style={{ fontSize: '20px', color: '#10B981' }}>🎉</span>
+                    )}
+                </div>
             </div>
 
             {showNotifyModal && (
