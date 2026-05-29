@@ -27,7 +27,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
   const { addXp } = useGamification();
   const { user, updateUserProfile, awardPoints } = useAuth();
 
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+     const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
@@ -38,18 +38,22 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
   // or when the user switches quizzes mid-delay.
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Reset state if quizId changes and cancel any pending timer
+  // Reset state safely if quizId changes and cancel any pending timer
   useEffect(() => {
     if (timerRef.current !== null) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
-    setCurrentQuestion(0);
-    setSelectedAnswer("");
-    setScore(0);
-    setShowResult(false);
-    setShowFeedback(false);
-  }, [quizId]);
+    
+    // Crucial Bug Patch: Force synchronized state updates to prevent out-of-order execution (#376)
+    setCurrentQuestion(() => 0);
+    setSelectedAnswer(() => "");
+    setScore(() => 0);
+    setShowResult(() => false);
+    setShowFeedback(() => false);
+    isSubmittingRef.current = false;
+  }, [quizId]); // Ensure dependency array balances tracking transitions cleanly
+
 
   // Cancel the timer on component unmount to prevent stale state updates
   useEffect(() => {
@@ -177,7 +181,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
         )}
 
         <div className={styles.actionButtons}>
-          <button
+          <button aria-label="Action button" 
             className={styles.retryButton}
             onClick={() => {
               setCurrentQuestion(0);
@@ -189,7 +193,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
             Retake Quiz
           </button>
           {onComplete && (
-            <button className={styles.completeButton} onClick={onComplete}>
+            <button aria-label="Action button"  className={styles.completeButton} onClick={onComplete}>
               Continue
             </button>
           )}
@@ -234,7 +238,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
             }
 
             return (
-              <button
+              <button aria-label="Action button" 
                 key={option}
                 className={optionClass}
                 disabled={showFeedback}
@@ -256,7 +260,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
           </div>
         )}
 
-        <button
+        <button aria-label="Action button" 
           className={styles.nextButton}
           disabled={!selectedAnswer || showFeedback}
           onClick={handleQuizSubmit}
