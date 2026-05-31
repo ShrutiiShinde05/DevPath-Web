@@ -242,6 +242,27 @@ Visit:
 http://localhost:3000
 ```
 
+### Docker Local Development
+
+You can also run the app in Docker for a consistent contributor setup:
+
+```bash
+cp .env.example .env.local
+docker compose up --build
+```
+
+The app will be available at:
+
+```txt
+http://localhost:3000
+```
+
+To stop the container, press `Ctrl+C`, then run:
+
+```bash
+docker compose down
+```
+
 ---
 
 ## 📜 Available Scripts
