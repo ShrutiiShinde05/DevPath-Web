@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const BackToTop = (): JSX.Element | null => {
+const BackToTop = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   useEffect(() => {
