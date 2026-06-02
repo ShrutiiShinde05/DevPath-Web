@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Github, LogIn, Menu, X, LogOut, Lock } from 'lucide-react';
+import { Flame, Github, LogIn, Menu, X, LogOut, Lock, Bookmark } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { useAuth } from '@/context/AuthContext';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import BookmarkDrawer from '@/components/ui/BookmarkDrawer';
 import styles from './Navbar.module.css';
 import { calculateStreak } from '@/lib/streakUtils';
 import { useScroll, useSpring } from 'framer-motion';
@@ -30,6 +31,7 @@ const navLinks = [
 export default function Navbar() {
     const { user, login, logout } = useAuth();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [bookmarkDrawerOpen, setBookmarkDrawerOpen] = useState(false);
     const { isMaintenanceMode } = useMaintenance();
     console.log("Navbar Render: isMaintenanceMode =", isMaintenanceMode);
 
@@ -110,6 +112,14 @@ export default function Navbar() {
                             </div>
                         )}
                         <ThemeToggle />
+                        <button
+                            onClick={() => setBookmarkDrawerOpen(true)}
+                            className={styles.iconButton}
+                            aria-label="Open Saved Bookmarks"
+                            title="Saved Bookmarks (Offline)"
+                        >
+                            <Bookmark size={20} />
+                        </button>
                         <a
                             href="https://github.com/devpathindcommunity-india/DevPath-Web"
                             target="_blank"
@@ -253,6 +263,7 @@ export default function Navbar() {
                     )
                 }
             </AnimatePresence >
+            <BookmarkDrawer isOpen={bookmarkDrawerOpen} onClose={() => setBookmarkDrawerOpen(false)} />
         </>
     );
 }
