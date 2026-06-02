@@ -1,6 +1,6 @@
 "use client";
 const AVATAR_FALLBACK = process.env.NEXT_PUBLIC_AVATAR_FALLBACK_URL ?? 'https://ui-avatars.com/api';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -41,6 +41,13 @@ export default function UserProfile() {
     const { user, logout, updateUserProfile, awardPoints } = useAuth();
     const { showSuccess, showError } = useNotification();
     const router = useRouter();
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
+    }, []);
 
     useEffect(() => {
         if (user?.email === 'devpathind.community@gmail.com') {
@@ -204,7 +211,8 @@ useEffect(() => {
 
         if (copied) {
             setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            timeoutRef.current = setTimeout(() => setCopied(false), 2000);
             showSuccess('Profile link copied to clipboard.');
         } else {
             showError('Copying the profile link is not supported in this browser.');

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GitFork, Download, Terminal, Play, CheckCircle, Copy, FileText } from 'lucide-react';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -52,6 +52,7 @@ const steps = [
 export default function InteractiveSteps() {
     const [activeStep, setActiveStep] = useState(0);
     const [copied, setCopied] = useState(false);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -60,12 +61,19 @@ export default function InteractiveSteps() {
         return () => clearInterval(interval);
     }, []);
 
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
+    }, []);
+
     const handleCopy = async (text: string) => {
         const copiedSuccessfully = await copyToClipboard(text);
 
         if (copiedSuccessfully) {
             setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            timeoutRef.current = setTimeout(() => setCopied(false), 2000);
         }
     };
 
