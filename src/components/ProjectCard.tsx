@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Star, GitFork, Eye, ExternalLink, Github } from "lucide-react"
@@ -62,23 +61,22 @@ export function ProjectCard({ project }: { project: Project }) {
                     {/* Tech Stack */}
                      <div className="flex flex-wrap gap-2 mb-auto">
                         {project.technologies.map((tech) => (
-
                     <TooltipProvider key={tech}>
-    <Tooltip>
-        <TooltipTrigger asChild>
-            <span
-                className="px-3 py-1 text-xs rounded-full bg-cyan-500/10 dark:bg-cyan-500/20 border border-cyan-500/20 dark:border-cyan-500/30 text-cyan-700 dark:text-cyan-300 cursor-default"
-            >
-                {tech}
-            </span>
-        </TooltipTrigger>
-        <TooltipContent side="top">
-            <p>{tech}</p>
-        </TooltipContent>
-    </Tooltip>
-</TooltipProvider>
-        ))}
-    </div>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                  <span
+                   className="px-3 py-1 text-xs rounded-full bg-cyan-500/10 dark:bg-cyan-500/20 border border-cyan-500/20 dark:border-cyan-500/30 text-cyan-700 dark:text-cyan-300 cursor-default"
+                   >
+                  {tech}
+                   </span>
+                     </TooltipTrigger>
+                       <TooltipContent side="top">
+                         <p>{tech}</p>
+                      </TooltipContent>
+                        </Tooltip>
+                       </TooltipProvider>
+                     ))}
+                  </div>
 
                     {/* Stats */}
                     <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400 mt-4 pt-4 border-t border-black/5 dark:border-white/10">
