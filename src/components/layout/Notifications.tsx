@@ -69,7 +69,6 @@ export default function Notifications() {
 
     return (
         <div className={styles.container} ref={dropdownRef}>
-            <button
             <button 
                 className={styles.bellButton}
                 onClick={() => setIsOpen(!isOpen)}

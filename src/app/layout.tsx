@@ -10,9 +10,10 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { SyncErrorListener } from "@/components/providers/sync-error-listener";
 import RouteAwareChrome from '@/components/layout/RouteAwareChrome';
+import 'github-markdown-css/github-markdown.css';
 import PageTrackerInit from '@/components/PageTrackerInit';
 import "./globals.css";
-import "./globals.css";
+
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: '--font-space' });
