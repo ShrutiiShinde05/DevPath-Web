@@ -9,6 +9,7 @@ const config: Config = {
   transform: {
     '^.+\\.(ts|tsx)$': 'babel-jest',
   },
+  testPathIgnorePatterns: ['<rootDir>/tests/e2e/'],
 };
 
 export default config;
