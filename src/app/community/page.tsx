@@ -1,7 +1,8 @@
 "use client";
 
+import Fuse from 'fuse.js';
 import ReviewsSection from "./ReviewsSection";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { collection, query, orderBy, getDocs, limit, collectionGroup } from 'firebase/firestore';
@@ -23,6 +24,7 @@ export default function CommunityPage() {
     const [projects, setProjects] = useState<any[]>([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [selectedProject, setSelectedProject] = useState<any>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const fetchData = async () => {
         setLoading(true);
@@ -57,8 +59,29 @@ export default function CommunityPage() {
     };
 
     useEffect(() => {
-        fetchData();
-    }, [activeTab, sortOption]);
+    fetchData();
+}, [activeTab, sortOption]);
+
+const fuse = useMemo(() => new Fuse(projects, {
+    keys: ['title', 'description', 'skills'],
+    threshold: 0.3,
+    ignoreLocation: true,
+    includeMatches: true,
+}), [projects]);
+
+const filteredProjects = useMemo(() => {
+    const query = searchQuery.trim();
+
+    if (!query) {
+        return projects;
+    }
+
+    return fuse.search(query).map((result) => ({
+    ...result.item,
+    matches: result.matches,
+}));
+}, [fuse, projects, searchQuery]);
+
 
     return (
         <div className="min-h-screen bg-background text-foreground pb-12">
@@ -128,26 +151,19 @@ export default function CommunityPage() {
                         </div>
                     </div>
                 )}
+                {/* Search Bar */}
+      {activeTab === 'showcase' && (
+         <div className="mb-6">
+        <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search projects... (typos allowed!)"
+            className="w-full max-w-md px-4 py-2 rounded-lg border border-border bg-muted text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+        />
+         </div>
+        )}
 
-                {/* Sort Options (Only for Showcase) */}
-                {activeTab === 'showcase' && (
-                    <div className="flex justify-end mb-6">
-                        <div className="flex bg-muted rounded-lg p-1">
-                            <button aria-label="Action button" 
-                                onClick={() => setSortOption('newest')}
-                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${sortOption === 'newest' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                            >
-                                Newest
-                            </button>
-                            <button aria-label="Action button" 
-                                onClick={() => setSortOption('popular')}
-                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${sortOption === 'popular' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                            >
-                                Popular
-                            </button>
-                        </div>
-                    </div>
-                )}
 
                 {/* Content */}
                 {loading ? (
@@ -184,13 +200,17 @@ export default function CommunityPage() {
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {projects.length === 0 ? (
+                                {filteredProjects.length === 0 ? (
                                     <div className="col-span-full text-center py-12 text-muted-foreground bg-muted/20 rounded-xl border border-border/50 border-dashed">
                                         <Target size={48} className="mx-auto mb-4 opacity-50" />
-                                        <p>No projects showcased yet.</p>
+                                        <p>
+    {searchQuery.trim()
+        ? 'No projects match your search.'
+        : 'No projects showcased yet.'}
+</p>
                                     </div>
                                 ) : (
-                                    projects.map(project => (
+                                    filteredProjects.map(project => (
                                         <ProjectCard
                                             key={project.id}
                                             project={project}
