@@ -172,7 +172,7 @@ function ProfileContent({ uid }: { uid?: string }) {
                     }
 
                     // Privacy Check
-                    if (userData.privacySettings?.isPublic === false) {
+                    if (userData.privacySettings?.isPublic === false && currentUser?.uid !== userId) {
                         setError('This profile is private.');
                         setShowNotFound(true);
                         setLoading(false);
