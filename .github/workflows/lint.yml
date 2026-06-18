@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
+      issues: write
 
     steps:
       - name: Checkout Repository
@@ -40,3 +42,17 @@ jobs:
         with:
           commit_message: "style: auto-format with Prettier"
           branch: ${{ github.head_ref }}
+
+      - name: Comment on Failure
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prAuthor = context.payload.pull_request.user.login;
+            const message = `Hi @${prAuthor}, I guess you need to update your PR so that all CI checks get passed!`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
