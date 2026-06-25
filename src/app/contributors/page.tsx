@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Github,
   Code,
@@ -67,6 +67,7 @@ const contributors: Contributor[] = [
 ];
 
 export default function ContributorsPage() {
+  const router = useRouter();
   const [topContributors, setTopContributors] = useState<TopContributor[]>([]);
   const [stats, setStats] = useState({
     totalContributors: 1240,
@@ -340,15 +341,13 @@ export default function ContributorsPage() {
           >
             View Open Issues
           </Button>
-          <Link href="/guidelines" passHref>
-            <Button
-              variant="secondary"
-              icon={<ExternalLink size={20} />}
-              asChild
-            >
-              Read Contributing Guide
-            </Button>
-          </Link>
+          <Button
+            variant="secondary"
+            icon={<ExternalLink size={20} />}
+            onClick={() => router.push('/guidelines')}
+          >
+            Read Contributing Guide
+          </Button>
         </div>
       </div>
     </div>
