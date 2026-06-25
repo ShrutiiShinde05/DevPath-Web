@@ -244,7 +244,7 @@ export default function ContributorsPage() {
                   </div>
                 )}
                 <div
-                  className={styles.avatar}
+                  className={`${styles.avatar} aspect-square w-full`}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -335,16 +335,13 @@ export default function ContributorsPage() {
         <h2 className={styles.ctaTitle}>Want to see your name here?</h2>
         <div className={styles.ctaButtons}>
           <Button
-            aria-label="Action button"
             variant="primary"
             icon={<Github size={20} />}
           >
             View Open Issues
           </Button>
-
-          <Link href="/contributing" passHref>
+          <Link href="/guidelines" passHref>
             <Button
-              aria-label="Action button"
               variant="secondary"
               icon={<ExternalLink size={20} />}
               asChild

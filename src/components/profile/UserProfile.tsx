@@ -438,7 +438,7 @@ export default function UserProfile() {
                 />
               </div>
               <button
-                aria-label="Action button"
+                aria-label="Change profile picture"
                 onClick={() => setIsEditingPhoto(!isEditingPhoto)}
                 className="absolute bottom-2 right-2 md:bottom-4 md:right-4 p-2 bg-card text-foreground rounded-full border border-border shadow-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100 z-10"
                 title="Change Avatar"
@@ -460,7 +460,6 @@ export default function UserProfile() {
                 />
                 <div className="flex gap-2">
                   <button
-                    aria-label="Action button"
                     onClick={handleSavePhoto}
                     disabled={isSaving}
                     className="flex-1 bg-primary text-primary-foreground py-1 rounded text-sm"
@@ -468,7 +467,6 @@ export default function UserProfile() {
                     Save
                   </button>
                   <button
-                    aria-label="Action button"
                     onClick={() => setIsEditingPhoto(false)}
                     className="flex-1 bg-muted text-muted-foreground py-1 rounded text-sm"
                   >
@@ -502,7 +500,6 @@ export default function UserProfile() {
 
             <div className="w-full mb-6">
               <button
-                aria-label="Action button"
                 onClick={() => setIsEditingAbout(true)}
                 className="w-full py-2 bg-card border border-border rounded-lg hover:bg-muted transition-colors font-medium text-sm"
               >
@@ -512,7 +509,6 @@ export default function UserProfile() {
 
             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
               <button
-                aria-label="Action button"
                 onClick={openFollowers}
                 className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors"
               >
@@ -523,7 +519,6 @@ export default function UserProfile() {
                 followers
               </button>
               <button
-                aria-label="Action button"
                 onClick={openFollowing}
                 className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors"
               >
@@ -564,9 +559,7 @@ export default function UserProfile() {
                     try {
                       const createdAt = user.createdAt as any;
                       const d = new Date(
-                        createdAt.seconds
-                          ? createdAt.seconds * 1000
-                          : createdAt
+                        createdAt.seconds ? createdAt.seconds * 1000 : createdAt
                       );
                       if (isNaN(d.getTime())) return 'Dec 2023';
                       return d.toLocaleDateString(undefined, {
@@ -621,14 +614,12 @@ export default function UserProfile() {
           {/* Achievements Sidebar Removed as per request */}
           <div className="pt-6 border-t border-border">
             <button
-              aria-label="Action button"
               onClick={() => setShowPrivacyModal(true)}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-2"
             >
               <Shield size={16} /> Privacy Settings
             </button>
             <button
-              aria-label="Action button"
               onClick={handleShareProfile}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-2"
             >
@@ -636,7 +627,6 @@ export default function UserProfile() {
               Profile
             </button>
             <button
-              aria-label="Action button"
               onClick={() => {
                 logout();
                 window.location.href = '/';
@@ -786,7 +776,7 @@ export default function UserProfile() {
               </h3>
               {!isEditingAbout && (
                 <button
-                  aria-label="Action button"
+                  aria-label="Edit about section"
                   onClick={() => setIsEditingAbout(true)}
                   className="text-sm text-primary hover:underline"
                 >
@@ -799,14 +789,12 @@ export default function UserProfile() {
               <div className="space-y-4">
                 <div className="flex bg-muted rounded-lg p-1 w-fit">
                   <button
-                    aria-label="Action button"
                     onClick={() => setAboutTab('write')}
                     className={`px-3 py-1 text-sm rounded-md ${aboutTab === 'write' ? 'bg-background shadow-sm' : ''}`}
                   >
                     Write
                   </button>
                   <button
-                    aria-label="Action button"
                     onClick={() => setAboutTab('preview')}
                     className={`px-3 py-1 text-sm rounded-md ${aboutTab === 'preview' ? 'bg-background shadow-sm' : ''}`}
                   >
@@ -916,14 +904,12 @@ export default function UserProfile() {
                 )}
                 <div className="flex justify-end gap-2">
                   <button
-                    aria-label="Action button"
                     onClick={() => setIsEditingAbout(false)}
                     className="px-4 py-2 rounded-lg hover:bg-muted"
                   >
                     Cancel
                   </button>
                   <button
-                    aria-label="Action button"
                     onClick={handleSaveAbout}
                     disabled={isSaving}
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
@@ -968,7 +954,6 @@ export default function UserProfile() {
                 <Flame className="text-orange-500" size={20} /> Projects
               </h3>
               <button
-                aria-label="Action button"
                 onClick={() => {
                   setProjectToEdit(null);
                   setShowProjectModal(true);
@@ -980,7 +965,11 @@ export default function UserProfile() {
             </div>
 
             {loadingProjects ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6" aria-busy="true" aria-label="Loading projects">
+              <div
+                className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                aria-busy="true"
+                aria-label="Loading projects"
+              >
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div
                     key={i}
@@ -1045,7 +1034,7 @@ export default function UserProfile() {
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold">Privacy Settings</h3>
               <button
-                aria-label="Action button"
+                aria-label="Close privacy settings"
                 onClick={() => setShowPrivacyModal(false)}
               >
                 <X size={24} />
@@ -1103,26 +1092,33 @@ export default function UserProfile() {
           >
             <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
               <h3 className="text-xl font-bold">Followers</h3>
-              <button aria-label="Action button" onClick={closeFollowersModal}>
+              <button aria-label="Close followers list" onClick={closeFollowersModal}>
                 <X size={24} />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-4 min-h-[200px]">
               {isLoadingFollowers ? (
-  <div className="space-y-4" aria-busy="true" aria-label="Loading followers">
-    {Array.from({ length: 5 }).map((_, i) => (
-      <div key={i} className="flex items-center gap-3 p-2 animate-pulse">
-        <div className="w-10 h-10 rounded-full bg-muted/40 flex-shrink-0" />
-        <div className="flex-1 space-y-2">
-          <div className="h-4 w-2/5 rounded bg-muted/40" />
-          <div className="h-3 w-1/4 rounded bg-muted/30" />
-        </div>
-        <div className="h-6 w-14 rounded-full bg-muted/30 flex-shrink-0" />
-      </div>
-    ))}
-  </div>
-) : followersList.length === 0 ? (
+                <div
+                  className="space-y-4"
+                  aria-busy="true"
+                  aria-label="Loading followers"
+                >
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 p-2 animate-pulse"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-muted/40 flex-shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-2/5 rounded bg-muted/40" />
+                        <div className="h-3 w-1/4 rounded bg-muted/30" />
+                      </div>
+                      <div className="h-6 w-14 rounded-full bg-muted/30 flex-shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              ) : followersList.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   No followers yet.
                 </div>
@@ -1175,26 +1171,33 @@ export default function UserProfile() {
           >
             <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
               <h3 className="text-xl font-bold">Following</h3>
-              <button aria-label="Action button" onClick={closeFollowingModal}>
+              <button aria-label="Close following list" onClick={closeFollowingModal}>
                 <X size={24} />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-4 min-h-[200px]">
               {isLoadingFollowing ? (
-  <div className="space-y-4" aria-busy="true" aria-label="Loading following">
-    {Array.from({ length: 5 }).map((_, i) => (
-      <div key={i} className="flex items-center gap-3 p-2 animate-pulse">
-        <div className="w-10 h-10 rounded-full bg-muted/40 flex-shrink-0" />
-        <div className="flex-1 space-y-2">
-          <div className="h-4 w-2/5 rounded bg-muted/40" />
-          <div className="h-3 w-1/4 rounded bg-muted/30" />
-        </div>
-        <div className="h-6 w-14 rounded-full bg-muted/30 flex-shrink-0" />
-      </div>
-    ))}
-  </div>
-) : followingList.length === 0 ? (
+                <div
+                  className="space-y-4"
+                  aria-busy="true"
+                  aria-label="Loading following"
+                >
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 p-2 animate-pulse"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-muted/40 flex-shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-2/5 rounded bg-muted/40" />
+                        <div className="h-3 w-1/4 rounded bg-muted/30" />
+                      </div>
+                      <div className="h-6 w-14 rounded-full bg-muted/30 flex-shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              ) : followingList.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   Not following anyone yet.
                 </div>
@@ -1250,7 +1253,7 @@ export default function UserProfile() {
                 {selectedProject.title}
               </h2>
               <button
-                aria-label="Action button"
+                aria-label="Close details"
                 onClick={() => setSelectedProject(null)}
                 className="p-2 hover:bg-muted rounded-full transition-colors"
               >
