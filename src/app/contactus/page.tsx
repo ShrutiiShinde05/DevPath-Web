@@ -24,9 +24,60 @@ export default function ContactUsPage() {
     message: '',
   });
 
+  const [touched, setTouched] = useState({
+    name: false,
+    email: false,
+    subject: false,
+    message: false,
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState('');
+
+  const getValidationErrors = (data: typeof formData) => {
+    const errors = {
+      name: '',
+      email: '',
+      subject: '',
+      message: '',
+    };
+
+    const nameTrimmed = data.name.trim();
+    const emailTrimmed = data.email.trim();
+    const subjectTrimmed = data.subject.trim();
+    const messageTrimmed = data.message.trim();
+
+    if (!nameTrimmed) {
+      errors.name = 'Name is required.';
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailTrimmed) {
+      errors.email = 'Email address is required.';
+    } else if (!emailRegex.test(emailTrimmed)) {
+      errors.email = 'Please enter a valid email address.';
+    }
+
+    if (!subjectTrimmed) {
+      errors.subject = 'Subject is required.';
+    }
+
+    if (!messageTrimmed) {
+      errors.message = 'Message is required.';
+    } else if (messageTrimmed.length < 20) {
+      errors.message = 'Message must be at least 20 characters.';
+    }
+
+    return errors;
+  };
+
+  const validationErrors = getValidationErrors(formData);
+  const isValid =
+    !validationErrors.name &&
+    !validationErrors.email &&
+    !validationErrors.subject &&
+    !validationErrors.message;
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -37,33 +88,50 @@ export default function ContactUsPage() {
     if (error) setError('');
   };
 
+  const handleBlur = (
+    e: React.FocusEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    setTouched((prev) => ({ ...prev, [e.target.name]: true }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !formData.name ||
-      !formData.email ||
-      !formData.subject ||
-      !formData.message
-    ) {
-      setError('Please fill in all required fields.');
+    if (!isValid) {
+      setTouched({
+        name: true,
+        email: true,
+        subject: true,
+        message: true,
+      });
+      setError('Please fix the errors before submitting.');
       return;
     }
 
     setIsSubmitting(true);
     setError('');
 
+    const trimmedData = {
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      subject: formData.subject.trim(),
+      message: formData.message.trim(),
+    };
+
     try {
       // TODO: Replace with real API call later
-      // Example: await fetch('/api/contact', { method: 'POST', body: JSON.stringify(formData) });
+      // Example: await fetch('/api/contact', { method: 'POST', body: JSON.stringify(trimmedData) });
 
-      console.log('Contact form submitted:', formData);
+      console.log('Contact form submitted:', trimmedData);
 
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
       setIsSubmitted(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
+      setTouched({ name: false, email: false, subject: false, message: false });
     } catch (err) {
       setError('Something went wrong. Please try again later.');
     } finally {
@@ -74,6 +142,8 @@ export default function ContactUsPage() {
   const resetForm = () => {
     setIsSubmitted(false);
     setError('');
+    setFormData({ name: '', email: '', subject: '', message: '' });
+    setTouched({ name: false, email: false, subject: false, message: false });
   };
 
   return (
@@ -133,10 +203,16 @@ export default function ContactUsPage() {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                       required
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-border bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                       placeholder="John Doe"
                     />
+                    {touched.name && validationErrors.name && (
+                      <p className="text-red-500 dark:text-red-400 text-xs mt-1">
+                        {validationErrors.name}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">
@@ -147,10 +223,16 @@ export default function ContactUsPage() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                       required
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-border bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                       placeholder="you@example.com"
                     />
+                    {touched.email && validationErrors.email && (
+                      <p className="text-red-500 dark:text-red-400 text-xs mt-1">
+                        {validationErrors.email}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -162,6 +244,7 @@ export default function ContactUsPage() {
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     required
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-border bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   >
@@ -171,6 +254,11 @@ export default function ContactUsPage() {
                       </option>
                     ))}
                   </select>
+                  {touched.subject && validationErrors.subject && (
+                    <p className="text-red-500 dark:text-red-400 text-xs mt-1">
+                      {validationErrors.subject}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -181,16 +269,30 @@ export default function ContactUsPage() {
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
+                    onBlur={handleBlur}
+                    maxLength={1000}
                     required
                     rows={8}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-border bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-y"
                     placeholder="Please describe your inquiry in detail..."
                   />
+                  <div className="flex justify-between items-start mt-1">
+                    <div className="flex-1">
+                      {touched.message && validationErrors.message && (
+                        <p className="text-red-500 dark:text-red-400 text-xs">
+                          {validationErrors.message}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap ml-auto">
+                      {formData.message.length} / 1000
+                    </div>
+                  </div>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isValid}
                   className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-4 px-8 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.985]"
                 >
                   <Send size={20} />
